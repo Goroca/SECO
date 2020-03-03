@@ -72,6 +72,10 @@ void Error_Handler(void);
 #define TCK_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 void setVoltage(void);
+void fastRigth(void);
+void lowRigth(void);
+void fastLeft(void);
+void lowLeft(void);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

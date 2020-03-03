@@ -91,7 +91,14 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+
+
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); //ACTIVA EN
+
   setVoltage();
+
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 
   /* USER CODE END 2 */
 
@@ -99,6 +106,16 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  //EL PULSO DEBE ESTAR ENTRE 0 y 2100!!!!!!!!!!!!!
+	  HAL_Delay(1000);
+	  fastRigth();
+	  HAL_Delay(1000);
+	  lowRigth();
+	  HAL_Delay(1000);
+	  fastLeft();
+	  HAL_Delay(1000);
+
+	  lowLeft();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -153,6 +170,47 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void setVoltage(void) {
 }
+
+
+
+void fastRigth(void)
+{
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+	  HAL_Delay(1);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 1800);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+
+
+}
+void lowRigth(void)
+{
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+	  HAL_Delay(1);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 300);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+
+}
+void fastLeft(void)
+{
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+	  HAL_Delay(1);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 1800);
+
+}
+void lowLeft(void)
+{
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+	  HAL_Delay(1);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 300);
+
+}
+
 /* USER CODE END 4 */
 
 /**

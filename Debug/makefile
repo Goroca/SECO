@@ -40,8 +40,8 @@ SECO.bin \
 all: SECO.elf secondary-outputs
 
 # Tool invocations
-SECO.elf: $(OBJS) $(USER_OBJS) H:\Proyectos\C-Microcontroladores\SECO\SECO\STM32F446RETX_FLASH.ld
-	arm-none-eabi-gcc -o "SECO.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"H:\Proyectos\C-Microcontroladores\SECO\SECO\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SECO.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+SECO.elf: $(OBJS) $(USER_OBJS) C:\Users\Carlos\STM32CubeIDE\workspace_1.1.0\SECO\STM32F446RETX_FLASH.ld
+	arm-none-eabi-gcc -o "SECO.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Carlos\STM32CubeIDE\workspace_1.1.0\SECO\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SECO.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
