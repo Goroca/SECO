@@ -187,7 +187,13 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void setVoltage(void) {
+void setVoltage(uint16_t voltage) {
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+	  HAL_Delay(1);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 150);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+
 }
 
 
