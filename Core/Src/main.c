@@ -26,6 +26,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include "stm32f4xx_hal_uart.h"
 
 /* USER CODE END Includes */
 
@@ -88,8 +90,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART2_UART_Init();
   MX_TIM2_Init();
+  MX_TIM1_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
 
 
@@ -99,6 +102,8 @@ int main(void)
 
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  uint8_t pos;
+  uint8_t data[8];
 
   /* USER CODE END 2 */
 
@@ -106,16 +111,30 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  //EL PULSO DEBE ESTAR ENTRE 0 y 199!!!!!!!!!!!!!
+	  //EL PULSO DEBE ESTAR ENTRE 0 y 2099!!!!!!!!!!!!!
 	  HAL_Delay(1000);
 	  fastRigth();
+	  pos=__HAL_TIM_GET_COUNTER(&htim2);
+	  integerToChar(data, pos);
+
 	  HAL_Delay(1000);
 	  lowRigth();
+	  pos=__HAL_TIM_GET_COUNTER(&htim2);
+	  integerToChar(data, pos);
+
+	  HAL_UART_Transmit(&huart4, data, 8, HAL_MAX_DELAY);
+
+
 	  HAL_Delay(1000);
 	  fastLeft();
-	  HAL_Delay(1000);
+	  pos=__HAL_TIM_GET_COUNTER(&htim2);
+	  integerToChar(data, pos);
 
+	  HAL_Delay(1000);
 	  lowLeft();
+	  pos=__HAL_TIM_GET_COUNTER(&htim2);
+	  integerToChar(data, pos);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -208,6 +227,18 @@ void lowLeft(void)
 	  HAL_Delay(1);
 	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
 	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 50);
+
+}
+
+void integerToChar(uint8_t *data, int m)
+{
+	sprintf(data, "%d", m);
+	data[7]= '\n';
+//	int i;
+//	for (i=0;i<10;i++){
+//		data[i]=data[i]+'0';
+//	}
+
 
 }
 
