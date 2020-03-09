@@ -92,13 +92,13 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   MX_TIM1_Init();
-  MX_UART4_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
 
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); //ACTIVA EN
 
-  setVoltage();
+ // setVoltage();
 
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
@@ -122,7 +122,7 @@ int main(void)
 	  pos=__HAL_TIM_GET_COUNTER(&htim2);
 	  integerToChar(data, pos);
 
-	  HAL_UART_Transmit(&huart4, data, 8, HAL_MAX_DELAY);
+	  HAL_UART_Transmit(&huart1, data, 8, HAL_MAX_DELAY);
 
 
 	  HAL_Delay(1000);
@@ -187,7 +187,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void setVoltage(uint16_t voltage) {
+void setVoltage(void) {
 	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
 	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
 	  HAL_Delay(1);
