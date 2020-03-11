@@ -90,20 +90,20 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART2_UART_Init();
   MX_TIM2_Init();
   MX_TIM1_Init();
-  MX_USART1_UART_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
 
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); //ACTIVA EN
-
- // setVoltage();
-
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); //ACTIVA ENABLE
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-  uint8_t pos;
-  uint8_t data[8];
+  HAL_TIM_Base_Start_IT(&htim3);
+
+
+  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
 
   /* USER CODE END 2 */
 
@@ -111,29 +111,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  //EL PULSO DEBE ESTAR ENTRE 0 y 2099!!!!!!!!!!!!!
-	  HAL_Delay(1000);
-	  fastRigth();
-	  pos=__HAL_TIM_GET_COUNTER(&htim2);
-	  integerToChar(data, pos);
+	  //EL PULSO DEBE ESTAR ENTRE 0 y 2099 !!!!!!!!!!!!!
 
-	  HAL_Delay(1000);
-	  lowRigth();
-	  pos=__HAL_TIM_GET_COUNTER(&htim2);
-	  integerToChar(data, pos);
-
-	  HAL_UART_Transmit(&huart1, data, 8, HAL_MAX_DELAY);
-
-
-	  HAL_Delay(1000);
-	  fastLeft();
-	  pos=__HAL_TIM_GET_COUNTER(&htim2);
-	  integerToChar(data, pos);
-
-	  HAL_Delay(1000);
-	  lowLeft();
-	  pos=__HAL_TIM_GET_COUNTER(&htim2);
-	  integerToChar(data, pos);
+	  //pos = htim1.Instance->CNT;
 
     /* USER CODE END WHILE */
 
@@ -187,13 +167,15 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void setVoltage(void) {
+void setVoltage(uint8_t voltage) {
+//	VOLTAGE = MAX_VOLTAGE*(PERIOD/MAX_PERIOD) FORMULA
+	uint32_t period;
+	period = MAX_PERIOD*(voltage/MAX_VOLTAGE);
 	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
 	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
 	  HAL_Delay(1);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 150);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, period);
 	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-
 }
 
 
@@ -221,6 +203,7 @@ void fastLeft(void)
 {
 	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
 	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+
 	  HAL_Delay(1);
 	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
 	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 150);
@@ -235,17 +218,26 @@ void lowLeft(void)
 	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 50);
 
 }
-
-void integerToChar(uint8_t *data, int m)
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	sprintf(data, "%d", m);
-	data[7]= '\n';
-//	int i;
-//	for (i=0;i<10;i++){
-//		data[i]=data[i]+'0';
-//	}
+	if (htim == &htim3){ //SALTA CADA SEGUNDO
+		uint32_t pos;
+		pos = htim1.Instance->CNT;
+		uint8_t aux[11];
 
+		sprintf(aux, "%10d", (int)pos);
 
+//		uint8_t aux2[6];
+//		int i;
+//		for (i=0;i<5;i++){
+//			aux2[i]=aux[i+1];
+//		}
+//		aux2[5]= '\n';
+		aux[10] = '\n';
+
+		HAL_UART_Transmit(&huart2, aux, 11, HAL_MAX_DELAY);
+
+	}
 }
 
 /* USER CODE END 4 */

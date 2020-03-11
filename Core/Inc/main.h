@@ -70,12 +70,14 @@ void Error_Handler(void);
 #define TCK_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
-void setVoltage(void);
+#define MAX_PERIOD 2100
+#define MAX_VOLTAGE 12
+
+void setVoltage(uint8_t voltage);
 void fastRigth(void);
 void lowRigth(void);
 void fastLeft(void);
 void lowLeft(void);
-void integerToChar(uint8_t *data, int m);
 
 /* USER CODE END Private defines */
 
