@@ -27,6 +27,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "stm32f4xx_hal_uart.h"
 
 /* USER CODE END Includes */
@@ -48,6 +50,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+  uint8_t voltage[TOTAL_CURVES] = {1,2,4,6,8,12};	//ACTUALIZAR VALOR DE TOTAL_CURVES
 
 /* USER CODE END PV */
 
@@ -95,25 +99,15 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-
-
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); //ACTIVA ENABLE
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-  HAL_TIM_Base_Start_IT(&htim3);
-
-
-  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
-
+  startSystem ();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  //EL PULSO DEBE ESTAR ENTRE 0 y 2099 !!!!!!!!!!!!!
-
-	  //pos = htim1.Instance->CNT;
+//	  pos = htim1.Instance->CNT;
+//	  isNewLap();
 
     /* USER CODE END WHILE */
 
@@ -167,77 +161,80 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void setVoltage(uint8_t voltage) {
+void startSystem (void)
+{
+	  p_voltage = voltage;
+	  count = MAX_COUNT;
+	  curves=0;
+	  vueltas=0;
+	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); //ACTIVA ENABLE
+	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+	  HAL_TIM_Base_Start_IT(&htim3);
+	  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
+}
+
+
+void setVoltage(uint8_t voltage)
+{
 //	VOLTAGE = MAX_VOLTAGE*(PERIOD/MAX_PERIOD) FORMULA
 	uint32_t period;
-	period = MAX_PERIOD*(voltage/MAX_VOLTAGE);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-	  HAL_Delay(1);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, period);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+	//PERIOD VALUES BETWEEN 0 AND 2099
+	period = (uint32_t)(MAX_PERIOD*voltage)/MAX_VOLTAGE;
+	if(voltage!=0){
+		period= period-1;
+	}
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, period);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
 }
 
-
-
-void fastRigth(void)
-{
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-	  HAL_Delay(1);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 150);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-
-
-}
-void lowRigth(void)
-{
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-	  HAL_Delay(1);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 50);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-
-}
-void fastLeft(void)
-{
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-
-	  HAL_Delay(1);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 150);
-
-}
-void lowLeft(void)
-{
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-	  HAL_Delay(1);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
-	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 50);
-
-}
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	if (htim == &htim3){ //SALTA CADA SEGUNDO
-		uint32_t pos;
-		pos = htim1.Instance->CNT;
-		uint8_t aux[11];
-
-		sprintf(aux, "%10d", (int)pos);
-
-//		uint8_t aux2[6];
-//		int i;
-//		for (i=0;i<5;i++){
-//			aux2[i]=aux[i+1];
-//		}
-//		aux2[5]= '\n';
-		aux[10] = '\n';
-
-		HAL_UART_Transmit(&huart2, aux, 11, HAL_MAX_DELAY);
-
+	if (htim == &htim3){ //SALTA CADA MILISEGUNDO
+		if (count<MAX_COUNT){
+			count++;
+			pos = htim1.Instance->CNT;
+			isNewLap();
+			uint8_t aux[11];
+			pos = pos + ENCODER_TOTAL_POS*vueltas;
+			sprintf(aux, "%10d", (int)pos);
+			aux[10] = '\n';
+			HAL_UART_Transmit(&huart2, aux, 11, HAL_MAX_DELAY);
+			if(count==STOP_COUNT){
+				setVoltage(0);
+			}
+		}
+		if(count >= MAX_COUNT){
+			if (curves<TOTAL_CURVES) {
+				curves++;
+				count=0;
+				last_pos=0;
+				pos=0;
+				htim1.Instance->CNT = 0;
+				vueltas=0;
+				uint8_t text1[13] = "Voltage is : ";
+				uint8_t text2[2];
+				sprintf(text2, "%02d", (int) *p_voltage);
+				uint8_t text3[3] = " V\n";
+				setVoltage(*p_voltage);
+				HAL_UART_Transmit(&huart2, text1, 13, HAL_MAX_DELAY);
+				HAL_UART_Transmit(&huart2, text2, 2, HAL_MAX_DELAY);
+				HAL_UART_Transmit(&huart2, text3, 3, HAL_MAX_DELAY);
+				p_voltage++;
+			}else{
+				HAL_TIM_Base_Stop_IT(&htim3);
+				uint8_t text[20] = "Programa finalizado\n";
+				HAL_UART_Transmit(&huart2, text, 20, HAL_MAX_DELAY);
+			}
+		}
 	}
+}
+
+void isNewLap(void){
+	if(pos + ENCODER_THRESHOLE < last_pos){
+		vueltas++;
+	}
+	last_pos = pos;
 }
 
 /* USER CODE END 4 */

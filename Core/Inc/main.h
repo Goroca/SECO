@@ -72,12 +72,26 @@ void Error_Handler(void);
 
 #define MAX_PERIOD 2100
 #define MAX_VOLTAGE 12
+#define MAX_COUNT 800
+#define STOP_COUNT 600
+#define TOTAL_CURVES 6
+#define ENCODER_TOTAL_POS 2100
+#define ENCODER_THRESHOLE 2
+#define ENCODER_LAP 24
+#define REDUCTER 231
 
-void setVoltage(uint8_t voltage);
-void fastRigth(void);
-void lowRigth(void);
-void fastLeft(void);
-void lowLeft(void);
+
+uint32_t pos;
+uint32_t last_pos;
+
+uint8_t *p_voltage;
+uint32_t count;
+uint8_t curves;
+uint8_t vueltas;
+
+void startSystem (void);
+void setVoltage (uint8_t voltage);
+void isNewLap (void);
 
 /* USER CODE END Private defines */
 
