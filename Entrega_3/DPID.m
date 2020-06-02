@@ -6,14 +6,14 @@ close all
 clear
 K = 2652.28;
 p = 64.986;
-taud1 = [0.5,2];
-taud2 = [0.1,0.5,2,]; %Debe ser >0!
-taui = [0.5,2];
+taud1 = 0.03;%[0.5,2];
+taud2 = 10;%[0.1,0.5,2,]; %Debe ser >0!
+taui = 20;%[0.5,2];
 % SOLO PINTA LAS FIGURAS DISTINTAS DE 0
 FIGURA_OUT = 1;
-FIGURA_ERROR_ESCALON = 0;
-FIGURA_ERROR_RAMPA = 0;
-FIGURA_ERROR_PARABOLA = 0;
+FIGURA_ERROR_ESCALON = 1;
+FIGURA_ERROR_RAMPA = 1;
+FIGURA_ERROR_PARABOLA = 1;
 period = 0.01;
 t=0:period:10;
 u1=t;
@@ -35,11 +35,11 @@ plotLabelse3 = cell(1,length(taud2));
 
 
 % EVALUACION
-subida = 0.8;
+subida = 1;
 tEstablecimiento = 0.4;
 tEstablecimientoReal = 0;
-establecimiento = 1 + 2/100;
-sobreElongacion = 1+6/100;
+establecimiento = 2/100;
+sobreElongacion = 6/100;
 sobreElongacionReal = 0;
 tSubida = 0.25;
 tSubidaReal=0;
@@ -60,23 +60,19 @@ for n=1:length(taui)
             for a = 1:length(y)
                 if y(a)  > subida && tSubidaReal == 0
                     tSubidaReal = (a-1)*yPeriod;
-                    
-                    if tSubidaReal < tSubida
-                        S=['Tiempo de Subida OK (',num2str(tSubidaReal),')- tau_D1 = ', num2str(taud1(m1)),' tau_D2 = ',num2str(taud2(m2)),' y tau_I = ',num2str(taui(n))];
-                        disp(S)
-                    end
+                    S=['Tiempo de Subida (',num2str(tSubidaReal),')- tau_D1 = ', num2str(taud1(m1)),' tau_D2 = ',num2str(taud2(m2)),' y tau_I = ',num2str(taui(n))];
+                    disp(S)
                 end
-                
                 if tSubidaReal ~=0
-                    if abs(y(a)) > sobreElongacionReal
-                        sobreElongacionReal = abs(y(a));
+                    if abs(y(a)- 1) > sobreElongacionReal
+                        sobreElongacionReal = abs(y(a)-1);
                     end
                 end
                 
                 if tEstablecimientoReal == 0 && tSubidaReal ~=0
                     next = 0;
-                    for b = a:(0.1/yPeriod)
-                        if abs(y(b)) > establecimiento
+                    for b = a:length(y)
+                        if abs(y(b)-1) > establecimiento
                             next=1;
                         end
                     end
@@ -85,18 +81,12 @@ for n=1:length(taui)
                     end
                 end
             end
-            if tEstablecimientoReal < tEstablecimiento
-                S=['Tiempo de Establecimiento OK (',num2str(tEstablecimientoReal),') - tau_D1 = ', num2str(taud1(m1)),' tau_D2 = ',num2str(taud2(m2)),' y tau_I = ',num2str(taui(n))];
-                disp(S)
-            end
+            S=['Tiempo de Establecimiento  (',num2str(tEstablecimientoReal),') - tau_D1 = ', num2str(taud1(m1)),' tau_D2 = ',num2str(taud2(m2)),' y tau_I = ',num2str(taui(n))];
+            disp(S)           
             
-            if sobreElongacionReal < sobreElongacion
-                S=['SobreElongación Máxima OK (',num2str(sobreElongacionReal),') - tau_D1 = ', num2str(taud1(m1)),' tau_D2 = ',num2str(taud2(m2)),' y tau_I = ',num2str(taui(n))];
-                disp(S)
-            end
-            
-            
-            
+            S=['SobreElongación Máxima  (',num2str(sobreElongacionReal*100),' %) - tau_D1 = ', num2str(taud1(m1)),' tau_D2 = ',num2str(taud2(m2)),' y tau_I = ',num2str(taui(n))];
+            disp(S)
+
             if FIGURA_OUT ~= 0
                 figure(1 + (n-1)*length(taud1)*graphics + (m1-1)*graphics);
                 hold on;
@@ -144,6 +134,4 @@ for n=1:length(taui)
         end
     end
 end
-
-
 hold off
