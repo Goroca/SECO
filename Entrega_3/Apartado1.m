@@ -76,8 +76,12 @@ Ye2 = He*X2;
 Ye3 = He*X3;
 
 e0= limit(s*Ye1,s,0);
+disp(e0)
 e1= limit(s*Ye2,s,0);
 e2= limit(s*Ye3,s,0);
+disp(e0)
+disp(e1)
+disp(e2)
 
 %% PD
 close all
@@ -161,7 +165,9 @@ E3 = He* X3;
 e0= limit(s*E1,s,0); %#OK
 e1= limit(s*E2,s,0); %#OK
 e2= limit(s*E3,s,0);%#OK
-
+disp(e0)
+disp(e1)
+disp(e2)
 %% P-D
 close all
 clear
@@ -244,6 +250,9 @@ E3 = He* X3;
 e0= limit(s*E1,s,0); %#OK
 e1= limit(s*E2,s,0); %#OK
 e2= limit(s*E3,s,0);%#OK
+disp(e0)
+disp(e1)
+disp(e2)
 %% PI
 close all
 clear
@@ -326,8 +335,9 @@ E3 = He* X3;
 e0= limit(s*E1,s,0); %#OK
 e1= limit(s*E2,s,0); %#OK
 e2= limit(s*E3,s,0);%#OK
-
-
+disp(e0)
+disp(e1)
+disp(e2)
 %% PID
 close all
 clear
@@ -438,6 +448,9 @@ E3 = He* X3;
 e0= limit(s*E1,s,0); %#OK
 e1= limit(s*E2,s,0); %#OK
 e2= limit(s*E3,s,0);%#OK
+disp(e0)
+disp(e1)
+disp(e2)
 %% PI-D
 close all
 clear
@@ -545,6 +558,9 @@ E3 = He* X3;
 e0= limit(s*E1,s,0); %#OK
 e1= limit(s*E2,s,0); %#OK
 e2= limit(s*E3,s,0);%#OK
+disp(e0)
+disp(e1)
+disp(e2)
 %% PID-D
 close all
 clear
@@ -652,26 +668,28 @@ E3 = He* X3;
 e0= limit(s*E1,s,0); %#OK
 e1= limit(s*E2,s,0); %#OK
 e2= limit(s*E3,s,0);%#OK
-
+disp(e0)
+disp(e1)
+disp(e2)
 %% D|PID
 close all
 clear
 K = 1166.89;
 p = 68;
 taud1 = [0.01,0.5,2];
-taud2 = [0.01,0.05,0.1,0.5,2]; %Debe ser negativo!
-taui = [0.5,2];
+taud2 = [0.1,0.5,1,5,20]; %Debe ser > 0
+taui = [10,20];
 % SOLO PINTA LAS FIGURAS DISTINTAS DE 0
-FIGURA_OUT = 1;
+FIGURA_OUT = 0;
 FIGURA_ESCALON = 0;
 FIGURA_RAMPA = 0;
-FIGURA_PARABOLA = 0;
+FIGURA_PARABOLA = 1;
 
-t=0:0.01:10;
+t=0:0.01:100;
 u1=t;
 u2=t.^2;
 graphics = 4;
-scaler = 8;     % Para reducir el tiempo de la señal
+scaler = 80;     % Para reducir el tiempo de la señal
 
 Kp = zeros(1,length(taud2));
 plotHandlesy = zeros(1,length(taud2));

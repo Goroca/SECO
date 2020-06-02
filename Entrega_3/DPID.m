@@ -15,11 +15,11 @@ FIGURA_ERROR_ESCALON = 1;
 FIGURA_ERROR_RAMPA = 1;
 FIGURA_ERROR_PARABOLA = 1;
 period = 0.01;
-t=0:period:10;
+t=0:period:100;
 u1=t;
 u2=t.^2;
 graphics = 4;
-scaler = 8;     % Para reducir el tiempo de la señal
+scaler = 80;     % Para reducir el tiempo de la señal
 
 yPeriod = period/scaler;
 
@@ -52,8 +52,8 @@ for n=1:length(taui)
             HeNum = [1 0 0 0];
             HeDen = Hden;
             y = step(Hnum,Hden,t/scaler);
-            e0 = step(HeNum,HeDen,t);
-            e1 = lsim(HeNum,HeDen,u1,t);
+            e0 = step(HeNum,HeDen,t/scaler);
+            e1 = lsim(HeNum,HeDen,u1,t/scaler);
             e2 = lsim(HeNum,HeDen,u2,t);
             
             
@@ -98,14 +98,14 @@ for n=1:length(taui)
                 figure(2 + (n-1)*length(taud1)*graphics + (m1-1)*graphics);
                 title(['Error a Función Escalón - \tau_{D1} = ', num2str(taud1(m1)),' y \tau_I = ',num2str(taui(n))]);
                 hold on;
-                plotHandlese1(m2) = plot(t,e0);
+                plotHandlese1(m2) = plot(t/scaler,e0);
                 plotLabelse1{m2} = ['\tau_{D2} = ',num2str(taud2(m2)),' y Kp = ',num2str(Kp(m2))];
             end
             if FIGURA_ERROR_RAMPA ~= 0
                 figure(3 + (n-1)*length(taud1)*graphics + (m1-1)*graphics);
                 title(['Error a Función Rampa - \tau_{D1} = ', num2str(taud1(m1)),' y \tau_I = ',num2str(taui(n))]);
                 hold on;
-                plotHandlese2(m2) = plot(t,e1);
+                plotHandlese2(m2) = plot(t/scaler,e1);
                 plotLabelse2{m2} = ['\tau_{D2} = ',num2str(taud2(m2)),' y Kp = ',num2str(Kp(m2))];
             end
             if FIGURA_ERROR_PARABOLA ~= 0
