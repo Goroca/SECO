@@ -5,9 +5,9 @@ hold on
 close all
 clear
 K = 2652.28;
-p = 68;
+p = 64.986;
 taud1 = [0.5,2];
-taud2 = [0.1,0.5,2,]; %Debe ser <0!
+taud2 = [0.1,0.5,2,]; %Debe ser >0!
 taui = [0.5,2];
 % SOLO PINTA LAS FIGURAS DISTINTAS DE 0
 FIGURA_OUT = 1;
