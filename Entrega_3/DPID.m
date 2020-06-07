@@ -5,10 +5,15 @@ hold on
 close all
 clear
 K = 2652.28;
+%K= K/23; %Reductora
 p = 64.986;
-taud1 = 0.03;%[0.5,2];
-taud2 = 10;%[0.1,0.5,2,]; %Debe ser >0!
-taui = 20;%[0.5,2];
+b2 = 0.5;
+b= 10;
+z = 20;
+Kp = p^2*(2*b+1/z^2)/(b2^2*K);%00.015;%[0.5,2];
+taud2 = p/(K*Kp);%0.02;%[0.1,0.5,2,]; %Debe ser >0!
+taui = b2*z^2*(2*b+1/z^2)/(b*p);%[0.5,2];
+taud1 = b2*(b-b2+2)/(p*(2*b+1/z^2));
 % SOLO PINTA LAS FIGURAS DISTINTAS DE 0
 FIGURA_OUT = 1;
 FIGURA_ERROR_ESCALON = 1;
@@ -23,7 +28,7 @@ scaler = 80;     % Para reducir el tiempo de la señal
 
 yPeriod = period/scaler;
 
-Kp = zeros(1,length(taud2));
+%Kp = zeros(1,length(taud2));
 plotHandlesy = zeros(1,length(taud2));
 plotLabelsy = cell(1,length(taud2));
 plotHandlese1 = zeros(1,length(taud2));
@@ -46,7 +51,7 @@ tSubidaReal=0;
 for n=1:length(taui)
     for m1=1:length(taud1)
         for m2=1:length(taud2)
-            Kp(m2) = round(p*taud2(m2)/K,3);
+            %Kp(m2) = round(p*taud2(m2)/K,3);
             Hnum = [(p+(Kp(m2)*K*taud1(m1)))   Kp(m2)*K  (Kp(m2)*K/taui(n))];
             Hden = [ 1  (p+(Kp(m2)*K*taud1(m1))) K*Kp(m2)  K*Kp(m2)/taui(n)];
             HeNum = [1 0 0 0];
@@ -134,4 +139,15 @@ for n=1:length(taui)
         end
     end
 end
+T = 5*10^-3;
+finalKp = ['Kp = ',num2str(Kp)];
+finalKi = ['Ki = ',num2str(Kp*T/taui)];
+finalKd = ['Kd = ',num2str(Kp*taud1/T)];
+finalKdParallel = ['Kd_Parallel = ',num2str(Kp*taud2/T)];
+
+disp(finalKp)
+disp(finalKi)
+disp(finalKd)
+disp(finalKdParallel)
+
 hold off
